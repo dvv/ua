@@ -1,0 +1,24 @@
+#!/bin/bash
+
+cleanse() {
+  #sed -r '1d;/,Other$/d;/https?:/d;/^[a-zA-Z"]/d;/\\/d;/""/d;/(\t|\r|\f|\b)/d' #| sed -n '200000,400000p'
+  sed -r '1d;/,Other$/d;/https?:/d;/^[a-zA-Z"]/d;/\\/d;/""/d;/\t/d;/\n/d' | sed -n '250000,1000000p'
+}
+
+uacsvtojson0() {
+  echo '{"":{}'
+  sed -nr 's/^([^,]*?),([^,]*?),([^,]*?),"?([^"]+)"?,"?(.+)"?$/,"\4": {"f":"\5","v1":"\1","v2":"\2","v3":"\3"}/p'
+  echo '}'
+}
+
+uacsvtojson() {
+  echo 'var a = [{}'
+  sed -nr 's/^([^,]*?),([^,]*?),([^,]*?),"?([^"]+)"?,"?(.+)"?$/,{"k":"\4", "f":"\5","v1":"\1","v2":"\2","v3":"\3"}/p'
+  echo '];console.log(JSON.stringify(a));'
+}
+
+#uacsvtojson <UserAgent.csv >1.json
+cleanse <UserAgent.csv | tee 111 | uacsvtojson >1.json
+#tojson <src
+#node load.js
+node 1.json >3.json
