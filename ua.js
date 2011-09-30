@@ -37,7 +37,7 @@ function prepare(src) {
   var m0 = freemem();
   // load prepared JSON
   try {
-    uatable = JSON.parse(Fs.readFileSync('ua.json', 'utf8'));
+    uatable = JSON.parse(Fs.readFileSync(__dirname + '/ua.json', 'utf8'));
   // no prepared JSON. convert from yaml source
   } catch(err) {
     var raw = require('yamlparser').eval(Fs.readFileSync(src, 'utf8')).test_cases;
@@ -54,7 +54,7 @@ function prepare(src) {
       uatable[k] = v;
     }
     // dump for future reuse
-    Fs.writeFileSync('ua.json', JSON.stringify(uatable), 'utf8');
+    Fs.writeFileSync(__dirname + '/ua.json', JSON.stringify(uatable), 'utf8');
     console.error('User agent lookup table prepared.');
   }
   console.error('User agent lookup table loaded.', Math.round((m0-freemem())/1024/1024*100)/100, 'Mb taken');
@@ -67,7 +67,7 @@ function prepare(src) {
  *
  */
 
-function lookup(str, cb) {
+module.exports.lookup = function lookup(str, cb) {
   var ua = uatable[str];
   if (!ua) {
     // need fetch from outside
@@ -84,5 +84,4 @@ function lookup(str, cb) {
  *
  */
 
-prepare('pgts.yaml');
-module.exports = lookup;
+prepare(__dirname + '/pgts.yaml');
